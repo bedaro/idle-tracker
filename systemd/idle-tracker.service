@@ -2,7 +2,7 @@
 Description=Idle Tracker
 
 [Service]
-ExecStart=/home/benr/Sync/bin/idle-tracker.py
+ExecStart=idle_tracker.py
 Restart=on-failure
 
 [Install]

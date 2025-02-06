@@ -10,7 +10,7 @@ by the user being monitored.
 
 ## Installation
 
- 1. Copy idle-tracker.py and mqttclient.py somewhere in your PATH.
+ 1. Copy idle_tracker.py and mqttclient.py somewhere in your PATH.
  2. Copy systemd/idle-tracker.service to ~/.config/systemd/user/ (you may need to add to the [Install] section to monitor more than just a gnome session)
  3. Install the required Python libraries (paho-mqtt, pydbus). If you
     want to use a virtual environment you may need to edit the first line

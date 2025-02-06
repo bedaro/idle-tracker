@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""Paho MQTT Client factory
+
+A basic factory for creating Paho MQTT client objects from a central
+config file
+"""
 
 import os
 import random
@@ -20,7 +25,13 @@ def fix_rel_path_or_none(config, key, root):
     return file
 
 def get_mqtt_client(config_key='default'):
-    client_id = f'python-mqtt-{random.randint(0, 1000)}'    
+    """Build a MQTT client instance and return it
+
+    Returns a tuple of the Paho Client, the hostname of the broker,
+    and the port to connected to. The last two are needed for the
+    eventual connect() call.
+    """
+    client_id = f'python-mqtt-{random.randint(0, 1000)}'
     config = configparser.ConfigParser()
     config_file = PurePath(CONFIG_ROOT, PurePath('mqtt.ini'))
     config.read(str(config_file))
@@ -32,19 +43,22 @@ def get_mqtt_client(config_key='default'):
     certfile = fix_rel_path_or_none(config[config_key], 'certfile', CONFIG_ROOT)
     keyfile = fix_rel_path_or_none(config[config_key], 'keyfile', CONFIG_ROOT)
     ca_certs = fix_rel_path_or_none(config[config_key], 'ca_certs', CONFIG_ROOT)
-    if any([f is not None for f in (certfile, keyfile, ca_certs)]):
+    if any(f is not None for f in (certfile, keyfile, ca_certs)):
         client.tls_set(certfile=certfile, keyfile=keyfile, ca_certs=ca_certs)
 
     return client, config[config_key]['broker'], int(config[config_key]['port'])
 
-
 def test_main():
+    """Perform a simple test of MQTT connectivity"""
     parser = argparse.ArgumentParser(description='Test interface for mqtt-client')
     parser.add_argument('topic', help='A test topic to subscribe to')
     args = parser.parse_args()
 
     client, broker, port = get_mqtt_client()
     def on_connect(client, userdata, flags, rc):
+        del client
+        del userdata
+        del flags
         if rc == 0:
             print("Connected to MQTT Broker!")
         else:
@@ -53,10 +67,13 @@ def test_main():
     client.connect(broker, port)
 
     def on_message(client, userdata, msg):
+        del client
+        del userdata
         print(f"Received '{msg.payload.decode()}' from '{msg.topic}' topic")
     client.subscribe(args.topic)
     client.on_message = on_message
 
     client.loop_forever()
 
-if __name__ == '__main__': test_main()
+if __name__ == '__main__':
+    test_main()
