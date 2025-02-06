@@ -10,12 +10,12 @@ by the user being monitored.
 
 ## Installation
 
- 1. Copy idle-tracker.py somewhere where it's executable.
+ 1. Copy idle-tracker.py and mqttclient.py somewhere in your PATH.
  2. Copy systemd/idle-tracker.service to ~/.config/systemd/user/ (you may need to add to the [Install] section to monitor more than just a gnome session)
  3. Install the required Python libraries (paho-mqtt, python-dbus). If
     you want to use a virtual environment you may need to edit the first
     line of the Python script.
- 4. Create a directory ~/.config/mqtt. Create a mqtt.ini file using the included example, and make sure you lock down permissions since it contains private credentials for your MQTT broker.
+ 4. Create a directory ~/.config/mqtt. Create a mqtt.ini file using the included example, and make sure you lock down permissions since it contains private credentials for your MQTT broker. Test your MQTT setup by running `mqttclient.py <topic>` to test whether you can subscribe to a particular topic on your broker.
  5. Run `systemctl --user enable idle-tracker.service`
  6. Run `systemctl --user start idle-tracker`
  7. Run `systemctl --user status idle-tracker` to ensure it's working, then check if your MQTT broker is being published to.
