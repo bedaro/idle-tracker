@@ -43,7 +43,7 @@ class Publisher:
                             failures (default 5). Pass 0 to disable this.
         """
 
-        # pylint: disable=too-many-arguments, too-many-positional-arguments
+        # pylint: disable=too-many-function-args
         def __init__(self, interval, function, args=None, kwargs=None, stop_after_fails=5):
             self.stop_after_fails = stop_after_fails
             self.fail_count = 0
