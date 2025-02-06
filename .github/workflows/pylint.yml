@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install cairo
-      run: sudo apt-get install python3-gi-cairo
+      run: sudo apt-get install libcairo2-dev libgirepository1.0-dev
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint pydbus paho-mqtt
+        pip install pylint pydbus paho-mqtt pygobject pycairo
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
