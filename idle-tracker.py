@@ -11,7 +11,6 @@ from threading import Timer
 
 from gi.repository import GLib
 from pydbus import SessionBus
-import dbus.mainloop.glib
 
 import mqttclient
 
