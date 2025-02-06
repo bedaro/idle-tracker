@@ -72,6 +72,7 @@ class Publisher:
         self.topic = topic
         self.interval = interval
         self.timer = None
+        self._value = None
 
     def set_value(self, value, now=False):
         """Set a new value to be published to the topic
