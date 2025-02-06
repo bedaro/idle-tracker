@@ -10,7 +10,7 @@ import socket
 from threading import Timer
 
 from gi.repository import GLib
-import dbus
+from pydbus import SessionBus
 import dbus.mainloop.glib
 
 import mqttclient
@@ -98,7 +98,7 @@ def setup_dbus(publisher):
     """Look for a screensaver interface and connect the publisher to it"""
     logger = root_logger.getChild('setup_dbus')
     # Borrowed from https://stackoverflow.com/a/55157266/413862
-    bus = dbus.SessionBus()
+    bus = SessionBus()
 
     screensaver_list = ['org.gnome.ScreenSaver',
                         'org.cinnamon.ScreenSaver',
@@ -109,15 +109,15 @@ def setup_dbus(publisher):
     for each in screensaver_list:
         try:
             object_path = '/{0}'.format(each.replace('.', '/'))
-            get_object = bus.get_object(each, object_path)
-            get_interface = dbus.Interface(get_object, each)
-            publisher.setValue(status_to_value(get_interface.GetActive()))
-            get_interface.connect_to_signal('ActiveChanged',
+            ss = bus.get(each, object_path)
+            ss_iface = ss[each]
+            publisher.setValue(status_to_value(ss_iface.GetActive()))
+            ss_iface.ActiveChanged.connect(
                     lambda status: publisher.setValue(status_to_value(status), now=True))
             logger.info(f'Listening for events from {each}')
             found = True
             break
-        except dbus.exceptions.DBusException:
+        except GLib.GError:
             pass
     if not found:
         logger.critical('No screensavers found to monitor')
@@ -133,7 +133,6 @@ def on_connect(client, userdata, flags, rc):
 if __name__ == '__main__':
     root_logger = logging.getLogger()
     logging.basicConfig(level=logging.INFO)
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     client, broker, port = mqttclient.get_mqtt_client()
     client.on_connect = on_connect
     client.connect(broker, port)
