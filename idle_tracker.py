@@ -35,18 +35,16 @@ class Publisher:
           intermittent failures (like connectivity problems).
         - If failures cause the loop to stop, the class attribute "died" will
           be set to True.
+
+        Most of the arguments are inherited from the superclass.
+
+        Additional keyword arguments:
+        stop_after_fails -- cancel the loop after this many consecutive
+                            failures (default 5). Pass 0 to disable this.
         """
 
         # pylint: disable=too-many-arguments, too-many-positional-arguments
         def __init__(self, interval, function, args=None, kwargs=None, stop_after_fails=5):
-            """Constructor.
-
-            Most of the arguments are inherited from the superclass.
-
-            Additional keyword arguments:
-            stop_after_fails -- cancel the loop after this many consecutive
-                                failures (default 5). Pass 0 to disable this.
-            """
             self.stop_after_fails = stop_after_fails
             self.fail_count = 0
             self.died = False
@@ -75,7 +73,13 @@ class Publisher:
         self.interval = interval
         self.timer = None
 
-    def setValue(self, value, now=False):
+    def set_value(self, value, now=False):
+        """Set a new value to be published to the topic
+
+        Set now to True in order for an update to be published
+        immediately. This will happen automatically on the first
+        invocation
+        """
         self._value = value
         if now or self.timer is None:
             if self.timer is not None:
@@ -84,6 +88,7 @@ class Publisher:
             self.timer.start()
 
     def stop(self):
+        """Stop publishing"""
         if self.timer is not None:
             self.timer.cancel()
 
@@ -117,9 +122,9 @@ def setup_dbus(publisher):
             object_path = f"/{each.replace('.', '/')}"
             ss = bus.get(each, object_path)
             ss_iface = ss[each]
-            publisher.setValue(status_to_value(ss_iface.GetActive()))
+            publisher.set_value(status_to_value(ss_iface.GetActive()))
             ss_iface.ActiveChanged.connect(
-                    lambda status: publisher.setValue(status_to_value(status), now=True))
+                    lambda status: publisher.set_value(status_to_value(status), now=True))
             logger.info('Listening for events from %s', each)
             found = True
             break
@@ -130,6 +135,7 @@ def setup_dbus(publisher):
     return found
 
 def main():
+    """Main"""
     logging.basicConfig(level=logging.INFO)
     c, broker, port = mqttclient.get_mqtt_client()
 
