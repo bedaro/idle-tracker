@@ -1,0 +1,9 @@
+[Unit]
+Description=Idle Tracker
+
+[Service]
+ExecStart=/home/benr/Sync/bin/idle-tracker.py
+Restart=on-failure
+
+[Install]
+WantedBy=gnome-session.target
